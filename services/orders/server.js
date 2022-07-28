@@ -36,5 +36,5 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(port, () => {
-  console.log(`Up and Running on port ${port} - This is Book service`);
+  logger.info(`Up and Running on port ${port} - This is Book service`);
 });

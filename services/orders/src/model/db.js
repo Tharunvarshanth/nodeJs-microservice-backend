@@ -1,7 +1,6 @@
 import { createConnection } from "mysql2/promise";
 import { Sequelize } from "sequelize";
-
-//initializeDb();
+import { logger } from "../utils/logger";
 
 const initializeDb = () => {
   const host = "localhost";
@@ -13,10 +12,10 @@ const initializeDb = () => {
   createConnection({ host, port, user, password })
     .then((con) => {
       con.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-      console.log("DB connected");
+      logger.info("DB connected");
     })
     .catch((err) => {
-      console.log("DB not connected", err);
+      logger.info("DB not connected", err);
     });
 
   // connect to db
