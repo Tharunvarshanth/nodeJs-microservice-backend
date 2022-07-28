@@ -1,22 +1,24 @@
-const express = require("express");
-const db = require("./model/db");
-const logger = require("./utils/logger");
-const orderRoutes = require("./routes");
+import express, { json } from "express";
+import { initializeDb } from "./src/model/db";
+import { logger } from "./src/utils/logger";
+import orderRoutes from "./src/routes";
 
 const app = express();
 //db connect
+const db = initializeDb();
+
 db.sequelize
   .sync({ force: true })
   .then(() => {
     logger.info("Synced db.");
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
+    logger.error("Failed to sync db: " + err.message);
   });
 
 const port = 3000;
 // parse requests of content-type - application/json
-app.use(express.json());
+app.use(json());
 
 app.use("/", orderRoutes);
 app.use(function (req, res, next) {

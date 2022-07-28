@@ -1,6 +1,6 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
+import { Sequelize, DataTypes, Model } from "sequelize";
 
-module.exports = (sequelize, Sequelize) => {
+export default (sequelize, Sequelize) => {
   const Order = sequelize.define("orders", {
     customerId: {
       type: DataTypes.BIGINT,
