@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import { initializeDb } from "./src/model/db";
 import { logger } from "./src/utils/logger";
-import customerRouter from "./src/routes";
+import customerRouter from "./src//handler/routes";
 
 const app = express();
 
