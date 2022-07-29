@@ -5,11 +5,12 @@
   "main": "app",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app",
+    "start": "node dist/app",
     "transpile": "babel app --out-dir dist-app",
-    "clean": "rimraf dist-app",
-    "build": "npm-run-all clean transpile",
-    "start:dev": "nodemon --exec babel-node app"
+    "clean": "rimraf dist",
+    "build": "rimraf dist && babel src --out-dir dist",
+    "build:test": "rimraf dist && babel src --out-dir dist  --copy-files",
+    "start:dev": "nodemon --exec babel-node src/app"
   },
   "author": "",
   "license": "ISC",
