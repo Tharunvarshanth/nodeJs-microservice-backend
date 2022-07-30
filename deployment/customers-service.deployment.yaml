@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customers-service
+  labels:
+    app: customers-service
+spec:
+  selector:
+    matchLabels:
+      app: customers-service
+  template:
+    metadata:
+      labels:
+        app: customers-service
+    spec:
+      containers:
+      - name: customers-service
+        image: ~REGISTRY/~REPOSITORY:~TAG
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+              memory: "64Mi"
+              cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customers-service
+  labels:
+    app: customers-service
+spec:
+  selector:
+    app: customers-service
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
