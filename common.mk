@@ -55,4 +55,5 @@ delete-config: kubectl delete -n $(K8NS) -f ./config
 
 deploy-app: create-namespace deploy-config deploy-deployment
 
-delete-app:	kubectl delete ns $(K8NS)
+delete-app:
+	kubectl delete ns $(K8NS)
