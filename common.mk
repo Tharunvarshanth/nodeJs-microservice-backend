@@ -4,12 +4,18 @@ include enviroment.mk
 include services.mk
 -include overrides.mk
 
-K8NS=$(PROJECT_NAME)-$(ENVIRONMENT)
+K8NS=$(PROJECT_NAME)-$(ENVIROMENT)
+
+create-namespace:
+	-kubectl create ns $(K8NS)
+
+config-namespace:
+	kubectl config set-context --current --namespace=$(K8NS)
 
 build-service-images: build-orders-service-image \
                       build-customers-service-image
 
-build-images:	build-service-images
+build-images: build-service-images
 
 clean-services: clean-orders-service \
 				clean-customers-service
@@ -27,18 +33,26 @@ deploy-orders-service:
 delete-orders-service:
 	kubectl delete -n $(K8NS) -f deployment/orders-service.deployment.yaml
 
-deploy-services: depoly-orders-service deploy-orders-service
+deploy-services: deploy-orders-service deploy-customers-service
 
-delete-services: delete-orders-service delete-orders-service
+delete-services: delete-orders-service delete-customers-service
 
-delete-deployment: kubectl delete -n $(K8NS) -f ./deployment
 ###
+
+deploy-deployment: deploy-services
+
+delete-deployment:
+	kubectl delete -n $(K8NS) -f ./deployment
 
 ###
 deploy-routing-config:
-    sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
+	sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-config: deploy-routing-config
 
 delete-config: kubectl delete -n $(K8NS) -f ./config
 ###
+
+deploy-app: create-namespace deploy-config deploy-deployment
+
+delete-app:	kubectl delete ns $(K8NS)

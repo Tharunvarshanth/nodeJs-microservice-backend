@@ -29,7 +29,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
-const port = 3001;
+const port = 3000;
 app.listen(port, () => {
   logger.info(`Up and Running on port ${port} - This is Book service`);
 });
