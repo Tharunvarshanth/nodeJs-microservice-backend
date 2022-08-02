@@ -42,11 +42,14 @@ delete-services: delete-orders-service delete-customers-service
 deploy-gateway:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 #	helm repo update
-	helm install nginx-ingress -f deployment/value-files/values-ingress-nginx.yaml ingress-nginx/ingress-nginx -n $(K8NS)
-#	helm install nginx-ingress ingress-nginx/ingress-nginx -n $(K8NS)
+#	helm install nginx-ingress -f deployment/value-files/values-ingress-nginx.yaml ingress-nginx/ingress-nginx -n $(K8NS)
+	helm install nginx-ingress ingress-nginx/ingress-nginx -n $(K8NS)
 
 upgrade-gateway:
 	helm upgrade booking-gateway ingress-nginx/ingress-nginx -n $(K8NS)
+
+remove-ingres-admin-webhook:
+	kubectl delete -A ValidatingWebhookConfiguration  nginx-ingress-ingress-nginx-admission
 
 delete-gateway:
 	helm uninstall nginx-ingress
@@ -76,7 +79,9 @@ delete-config:
 	kubectl delete -n $(K8NS) -f ./config
 ###
 
-deploy-app: create-namespace deploy-gateway deploy-config deploy-deployment
+
+
+deploy-app: create-namespace deploy-gateway remove-ingres-admin-webhook deploy-config deploy-deployment
 
 delete-app:
 	kubectl delete ns $(K8NS)
