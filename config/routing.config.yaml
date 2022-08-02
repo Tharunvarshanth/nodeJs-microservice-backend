@@ -2,13 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: booking-ingress
+  namespace: booking-dev
   labels:
     name: booking-ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: ~APP_HOST
+  - host: localhost
     http:
       paths:
       - pathType: Prefix

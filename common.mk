@@ -5,6 +5,7 @@ include services.mk
 -include overrides.mk
 
 K8NS=$(PROJECT_NAME)-$(ENVIROMENT)
+KONG_NAME=$(PROJECT_NAME)-kong
 
 create-namespace:
 	-kubectl create ns $(K8NS)
@@ -38,6 +39,27 @@ deploy-services: deploy-orders-service deploy-customers-service
 delete-services: delete-orders-service delete-customers-service
 
 ###
+deploy-gateway:
+	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+#	helm repo update
+	helm install nginx-ingress -f deployment/value-files/values-ingress-nginx.yaml ingress-nginx/ingress-nginx -n $(K8NS)
+#	helm install nginx-ingress ingress-nginx/ingress-nginx -n $(K8NS)
+
+upgrade-gateway:
+	helm upgrade booking-gateway ingress-nginx/ingress-nginx -n $(K8NS)
+
+delete-gateway:
+	helm uninstall nginx-ingress
+
+deploy-gateway-kong:
+	helm repo add kong https://charts.konghq.com
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(KONG_REPO_NAME)|g;s|~TAG|$(KONG_VERSION)|g;' deployment/value-files/kong-values.config.yaml | helm install booking-gateway kong/kong -n $(K8NS) -f -
+
+upgrade-gateway-kong:
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(KONG_REPO_NAME)|g;s|~TAG|$(KONG_VERSION)|g;' deployment/value-files/kong-values.config.yaml | helm upgrade booking-gateway kong/kong -n $(K8NS) -f -
+
+delete-gateway-kong:
+	helm uninstall -n $(K8NS) booking-gateway
 
 deploy-deployment: deploy-services
 
@@ -46,14 +68,15 @@ delete-deployment:
 
 ###
 deploy-routing-config:
-	sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
+	sed -e 's|~APP_HOST|$(APP_HOST)|g;s|~NAME_SPACE|$(K8NS)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-config: deploy-routing-config
 
-delete-config: kubectl delete -n $(K8NS) -f ./config
+delete-config:
+	kubectl delete -n $(K8NS) -f ./config
 ###
 
-deploy-app: create-namespace deploy-config deploy-deployment
+deploy-app: create-namespace deploy-gateway deploy-config deploy-deployment
 
 delete-app:
 	kubectl delete ns $(K8NS)

@@ -8,12 +8,13 @@ IMAGE_LOAD_OVERWRITE=false
 
 CUSTOMERS_SERVICE_REPO_NAME=$(CUSTOMERS_SERVICE_NAME)
 ORDERS_SERVICE_REPO_NAME=$(ORDERS_SERVICE_NAME)
+KONG_REPO_NAME=$(KONG_NAME)
 
 minikube-delete-images:
 	minikube image rm $(IMAGE_REGISTRY)/$(ORDERS_SERVICE_IMAGE_NAME)
 	minikube image rm $(IMAGE_REGISTRY)/$(CUSTOMERS_SERVICE_IMAGE_NAME)
-#build-service-images
-minikube-load-images:
+
+minikube-load-images: build-service-images
 	minikube image load $(ORDERS_SERVICE_IMAGE_NAME) --overwrite=$(IMAGE_LOAD_OVERWRITE)
 	minikube image load $(CUSTOMERS_SERVICE_IMAGE_NAME) --overwrite=$(IMAGE_LOAD_OVERWRITE)
 
@@ -29,4 +30,5 @@ create-tunnel:
 	minikube tunnel
 
 
-env-up:	create-cluster minikube-load-images deploy-app config-namespace create-tunnel
+env-up:	create-cluster  deploy-app config-namespace create-tunnel
+#minikube-load-images
