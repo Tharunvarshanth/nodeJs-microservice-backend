@@ -2,4 +2,4 @@
 ENVIROMENT=dev
 PROJECT_NAME=booking
 
-APP_HOST=localhost
+APP_HOST=
