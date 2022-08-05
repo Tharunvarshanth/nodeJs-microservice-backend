@@ -5,7 +5,6 @@ include services.mk
 -include overrides.mk
 
 K8NS=$(PROJECT_NAME)-$(ENVIROMENT)
-KONG_NAME=$(PROJECT_NAME)-kong
 
 create-namespace:
 	-kubectl create ns $(K8NS)
@@ -54,16 +53,6 @@ remove-ingres-admin-webhook:
 
 delete-gateway:
 	helm uninstall nginx-ingress
-
-deploy-gateway-kong:
-	helm repo add kong https://charts.konghq.com
-	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(KONG_REPO_NAME)|g;s|~TAG|$(KONG_VERSION)|g;' deployment/value-files/kong-values.config.yaml | helm install booking-gateway kong/kong -n $(K8NS) -f -
-
-upgrade-gateway-kong:
-	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(KONG_REPO_NAME)|g;s|~TAG|$(KONG_VERSION)|g;' deployment/value-files/kong-values.config.yaml | helm upgrade booking-gateway kong/kong -n $(K8NS) -f -
-
-delete-gateway-kong:
-	helm uninstall -n $(K8NS) booking-gateway
 
 deploy-deployment: deploy-services
 

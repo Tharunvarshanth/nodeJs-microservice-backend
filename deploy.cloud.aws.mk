@@ -45,15 +45,15 @@ login-registry:
 	aws ecr get-login-password --region $(REGION) | docker login --username AWS --password-stdin $(IMAGE_REGISTRY)
 
 
-create-registry-repositories:
+create--aws-registry-repositories:
 	- aws ecr create-repository --repository-name $(CUSTOMERS_SERVICE_IMAGE_REPO_NAME) --region $(REGION)
 	- aws ecr create-repository --repository-name $(ORDERS_SERVICE_REPO_NAME) --region $(REGION)
 
-delete-registry-repositories:
+delete--aws-registry-repositories:
 	- aws ecr delete-repository --force --repository-name $(CUSTOMERS_SERVICE_IMAGE_REPO_NAME) --region $(REGION)
 	- aws ecr delete-repository --force --repository-name $(ORDERS_SERVICE_REPO_NAME) --region $(REGION)
 
-env-up:	create-cluster
+start:	create-cluster
 
-env-down: delete-cluster
+remove-cluster: delete-cluster
 
