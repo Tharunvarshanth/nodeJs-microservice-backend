@@ -72,7 +72,7 @@ delete-deployment:
 
 ###
 deploy-routing-config:
-	sed -e 's|~APP_HOST|$(APP_HOST)|g;s|~NAME_SPACE|$(K8NS)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
+	sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-config: deploy-routing-config
 
