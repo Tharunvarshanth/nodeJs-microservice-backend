@@ -7,7 +7,7 @@ const initializeDb = () => {
   const port = "3306";
   const user = "root";
   const password = "root";
-  const database = "book-microservice";
+  const database = "booking_microservice";
 
   createConnection({ host, port, user, password })
     .then((con) => {
