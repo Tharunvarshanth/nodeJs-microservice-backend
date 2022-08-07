@@ -30,3 +30,4 @@ create-tunnel:
 
 
 start: create-cluster minikube-load-images deploy-app config-namespace create-tunnel
+#minikube-load-images

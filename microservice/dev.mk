@@ -1,11 +1,11 @@
 
 redeploy-orders-service:
-	- docker rmi $(ORDERS_SERVICE_IMAGE_NAME)
-	  delete-orders-service \
-	- minikube image rm $(ORDERS_SERVICE_IMAGE_NAME)
-	  build-orders-service-image \
-	- minikube image load $(ORDERS_SERVICE_IMAGE_NAME)
-	  deploy-orders-service
+	docker rmi $(ORDERS_SERVICE_IMAGE_NAME) \
+	delete-orders-service
+	minikube image rm $(ORDERS_SERVICE_IMAGE_NAME)
+	build-orders-service-image
+	minikube image load $(ORDERS_SERVICE_IMAGE_NAME)
+	deploy-orders-service
 #
 
 redeploy-customers-service:
