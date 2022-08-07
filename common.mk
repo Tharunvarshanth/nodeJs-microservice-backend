@@ -67,7 +67,7 @@ deploy-orders-service-config:
 	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD|$(DB_PASSWORD)|g;' config/orders-service.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-customers-service-config:
-	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD$(DB_PASSWORD)|g;' config/customers-service.config.yaml | kubectl apply -n $(K8NS) -f -
+	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD|$(DB_PASSWORD)|g;' config/customers-service.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-config: deploy-routing-config deploy-orders-service-config deploy-customers-service-config
 

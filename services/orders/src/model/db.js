@@ -1,13 +1,14 @@
 import { createConnection } from "mysql2/promise";
 import { Sequelize } from "sequelize";
 import { logger } from "../utils/logger";
+import {Config} from '../env/config';
 
 const initializeDb = () => {
-  const host = "localhost";
-  const port = "3306";
-  const user = "root";
-  const password = "root";
-  const database = "booking_microservice";
+  const host = Config.db.host;
+  const port =  Config.db.port;
+  const user =  Config.db.username;
+  const password = Config.db.password;
+  const database =  Config.db.database;
 
   createConnection({ host, port, user, password })
     .then((con) => {
