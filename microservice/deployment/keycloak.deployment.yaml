@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  ports:
+   - name: https
+     port: 8443
+     targetPort: 8443
+   - name: http
+     port: 3000
+     targetPort: 3000
+  selector:
+    app: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: ~REGISTRY/~REPOSITORY:~TAG
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+              memory: "128Mi"
+              cpu: "100m"
+        ports:
+        - name: jgroups
+          containerPort: 7600
+        - name: http
+          containerPort: 3000
+        - name: https
+          containerPort: 8443
+        env:
+          - name: KEYCLOAK_USER
+            value: "keycloakuser"
+          - name: KEYCLOAK_PASSWORD
+            value: "keycloak"
+          - name: PROXY_ADDRESS_FORWARDING
+            value: "true"
+          - name: KEYCLOAK_FRONTEND_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: FRONTEND_URL
+          - name: DB_VENDOR
+            value: MYSQL
+          - name: DB_ADDR
+            value: booking-db-mysql
+          - name: DB_DATABASE
+            value: keycloak
+          - name: DB_USER
+            value: keycloakuser
+          - name: DB_PASSWORD
+            value: keycloak
+

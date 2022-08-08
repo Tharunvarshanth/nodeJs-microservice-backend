@@ -28,22 +28,22 @@ spec:
           - name: DB_HOST
             valueFrom:
               configMapKeyRef:
-                name: customers-service
+                name: db-config
                 key: DB_HOST
           - name: DB_PORT
             valueFrom:
               configMapKeyRef:
-                name: customers-service
+                name: db-config
                 key: DB_PORT
           - name: DB_USER
             valueFrom:
               configMapKeyRef:
-                name: customers-service
+                name: db-config
                 key: DB_USER
           - name: DB_PASSWORD
             valueFrom:
               configMapKeyRef:
-                name: customers-service
+                name: db-config
                 key: DB_PASSWORD
 
 

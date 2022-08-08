@@ -4,7 +4,10 @@ include enviroment.mk
 include services.mk
 -include overrides.mk
 
+MYSQL_NAME=$(PROJECT_NAME)-mysql
 K8NS=$(PROJECT_NAME)-$(ENVIROMENT)
+
+MYSQL_IMAGE_NAME=$(MYSQL_NAME):$(MYSQL_VERSION)
 
 create-namespace:
 	-kubectl create ns $(K8NS)
@@ -12,15 +15,30 @@ create-namespace:
 config-namespace:
 	kubectl config set-context --current --namespace=$(K8NS)
 
+build-db-image:
+	$(DOCKER_BUILD_CMD) -f deployment/db/Dockerfile deployment/db -t $(MYSQL_IMAGE_NAME)
+
 build-service-images: build-orders-service-image \
                       build-customers-service-image
 
-build-images: build-service-images
+build-images:	build-db-image build-service-images
 
 clean-services: clean-orders-service \
 				clean-customers-service
 
 ###
+depoly-mysql-db:
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+#	helm install booking-db bitnami/mysql
+#	helm install booking-db -f ./deployment/value-files/values-mysql.yaml bitnami/mysql -n $(K8NS)
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(MYSQL_REPO_NAME)|g;s|~TAG|$(MYSQL_VERSION)|g;' deployment/value-files/values-mysql.yaml | helm install booking-db bitnami/mysql -n $(K8NS) -f -
+
+upgrade-db:
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(MYSQL_REPO_NAME)|g;s|~TAG|$(MYSQL_VERSION)|g;' deployment/value-files/values-mysql.yaml | helm upgrade booking-db bitnami/mysql -n $(K8NS) -f -
+
+delete-db:
+	helm delete booking-db
+
 deploy-customers-service:
 	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(CUSTOMERS_SERVICE_REPO_NAME)|g;s|~TAG|$(CUSTOMERS_SERVICE_VERSION)|g;' deployment/customers-service.deployment.yaml | kubectl apply -n $(K8NS) -f -
 
@@ -33,9 +51,15 @@ deploy-orders-service:
 delete-orders-service:
 	kubectl delete -n $(K8NS) -f deployment/orders-service.deployment.yaml
 
-deploy-services: deploy-orders-service deploy-customers-service
+deploy-keycloak-service:
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(KEYCLOAK_SERVICE_REPO_NAME)|g;s|~TAG|$(KEYCLOAK_SERVICE_VERSION)|g;' deployment/keycloak.deployment.yaml | kubectl apply -n $(K8NS) -f -
 
-delete-services: delete-orders-service delete-customers-service
+delete-keycloak-service:
+	kubectl delete -n  $(K8NS) -f deployment/keycloak.deployment.yaml
+
+deploy-services: deploy-orders-service deploy-customers-service deploy-keycloak-service
+
+delete-services: delete-orders-service delete-customers-service delete-keycloak-service
 
 ###
 deploy-gateway:
@@ -69,7 +93,13 @@ deploy-orders-service-config:
 deploy-customers-service-config:
 	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD|$(DB_PASSWORD)|g;' config/customers-service.config.yaml | kubectl apply -n $(K8NS) -f -
 
-deploy-config: deploy-routing-config deploy-orders-service-config deploy-customers-service-config
+deploy-db-config:
+	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD|$(DB_PASSWORD)|g;' config/db.config.yaml | kubectl apply -n $(K8NS) -f -
+
+deploy-app-general-config:
+	sed -e 's|~FRONTEND_URL|$(FRONTEND_URL)|g;' config/general-app.config.yaml | kubectl apply -n $(K8NS) -f -
+
+deploy-config:	deploy-db-config deploy-app-general-config deploy-routing-config deploy-orders-service-config deploy-customers-service-config
 
 delete-config:
 	kubectl delete -n $(K8NS) -f ./config
@@ -77,7 +107,7 @@ delete-config:
 
 
 
-deploy-app: create-namespace deploy-gateway deploy-config deploy-deployment
+deploy-app: create-namespace deploy-gateway deploy-config depoly-mysql-db deploy-deployment
 
 delete-app:
 	kubectl delete ns $(K8NS)
