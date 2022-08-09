@@ -78,6 +78,18 @@ remove-ingres-admin-webhook:
 delete-gateway:
 	helm uninstall nginx-ingress
 
+deploy-kong-gateway:
+	helm repo add kong https://charts.konghq.com
+	helm install booking-kong-gateway kong/kong -n $(K8NS) -f deployment/value-files/values-kong.yaml
+#	deployment/value-files/values-kong.yaml | helm install booking-kong-gateway kong/kong -n $(K8NS) -f -
+#	helm install booking-kong-gateway kong/kong -n $(K8NS)
+
+upgrade-kong-gateway:
+	deployment/value-files/values-kong.yaml | helm upgrade booking-kong-gateway kong/kong -n $(K8NS) -f -
+
+delete-kong-gateway:
+	helm delete booking-kong-gateway
+
 deploy-deployment: deploy-services
 
 delete-deployment:
@@ -107,7 +119,7 @@ delete-config:
 
 
 
-deploy-app: create-namespace deploy-gateway deploy-config depoly-mysql-db deploy-deployment
+deploy-app: create-namespace deploy-kong-gateway deploy-config depoly-mysql-db deploy-deployment
 
 delete-app:
 	kubectl delete ns $(K8NS)

@@ -1,0 +1,8 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: kong-test-plugin
+config:
+  header_name: my-request-id
+  echo_downstream: true
+plugin: kong-test-plugin
