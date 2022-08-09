@@ -6,12 +6,12 @@ metadata:
     app: keycloak
 spec:
   ports:
-   - name: https
-     port: 8443
-     targetPort: 8443
-   - name: http
-     port: 3000
-     targetPort: 3000
+    - name: https
+      port: 8443
+      targetPort: 8443
+    - name: http
+      port: 8080
+      targetPort: 8080
   selector:
     app: keycloak
 ---
@@ -39,13 +39,6 @@ spec:
           requests:
               memory: "128Mi"
               cpu: "100m"
-        ports:
-        - name: jgroups
-          containerPort: 7600
-        - name: http
-          containerPort: 3000
-        - name: https
-          containerPort: 8443
         env:
           - name: KEYCLOAK_USER
             value: "keycloakuser"
@@ -68,4 +61,11 @@ spec:
             value: keycloakuser
           - name: DB_PASSWORD
             value: keycloak
+        ports:
+            - name: jgroups
+              containerPort: 7600
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8443
 
