@@ -6,6 +6,7 @@ include services.mk
 
 MYSQL_NAME=$(PROJECT_NAME)-mysql
 K8NS=$(PROJECT_NAME)-$(ENVIROMENT)
+BOOKING_KONG_REPO_NAME=$(PROJECT_NAME)-kong
 
 MYSQL_IMAGE_NAME=$(MYSQL_NAME):$(MYSQL_VERSION)
 
@@ -80,9 +81,7 @@ delete-gateway:
 
 deploy-kong-gateway:
 	helm repo add kong https://charts.konghq.com
-	helm install booking-kong-gateway kong/kong -n $(K8NS) -f deployment/value-files/values-kong.yaml
-#	deployment/value-files/values-kong.yaml | helm install booking-kong-gateway kong/kong -n $(K8NS) -f -
-#	helm install booking-kong-gateway kong/kong -n $(K8NS)
+	sed -e 's|~REGISTRY|$(IMAGE_REGISTRY)|g;s|~REPOSITORY|$(BOOKING_KONG_REPO_NAME)|g;s|~TAG|$(BOOKING_KONG_VERSION)|g;' deployment/value-files/values-kong.yaml | helm install booking-kong-gateway kong/kong -n $(K8NS) -f -
 
 upgrade-kong-gateway:
 	deployment/value-files/values-kong.yaml | helm upgrade booking-kong-gateway kong/kong -n $(K8NS) -f -

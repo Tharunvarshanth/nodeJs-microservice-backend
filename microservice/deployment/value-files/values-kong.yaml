@@ -92,6 +92,7 @@ env:
   portal_api_error_log: /dev/stderr
   prefix: /kong_prefix/
 
+
 # This section is any customer specific environments variables that doesn't require KONG_ prefix.
 # These custom environment variables are typicall used in custom plugins or serverless plugins to
 # access environment specific credentials or tokens.
@@ -112,8 +113,8 @@ extraLabels: {}
 
 # Specify Kong's Docker image and repository details here
 image:
-  repository: kong
-  tag: "2.8"
+  repository: ~REGISTRY/~REPOSITORY
+  tag: ~TAG
   # Kong Enterprise
   # repository: kong/kong-gateway
   # tag: "2.8"
