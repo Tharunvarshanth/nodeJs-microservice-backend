@@ -23,4 +23,3 @@ EXPOSE 8000 8443 8001 8444
 STOPSIGNAL SIGQUIT
 HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD kong health
 CMD ["kong", "docker-start"]
-#docker build --no-cache --platform linux/amd64  -t triton-kong:0.0.6 .

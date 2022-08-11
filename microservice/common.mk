@@ -58,6 +58,12 @@ deploy-keycloak-service:
 delete-keycloak-service:
 	kubectl delete -n  $(K8NS) -f deployment/keycloak.deployment.yaml
 
+deploy-api-gateway-plugin:
+	kubectl apply -n $(K8NS) -f deployment/api-gateway-kong.deployment.yaml
+
+delete-api-gateway-plugin:
+	kubectl delete -n  $(K8NS) -f deployment/api-gateway-kong.deployment.yaml
+
 deploy-services: deploy-orders-service deploy-customers-service deploy-keycloak-service
 
 delete-services: delete-orders-service delete-customers-service delete-keycloak-service
@@ -89,7 +95,7 @@ upgrade-kong-gateway:
 delete-kong-gateway:
 	helm delete booking-kong-gateway
 
-deploy-deployment: deploy-services
+deploy-deployment:	deploy-api-gateway-plugin deploy-services
 
 delete-deployment:
 	kubectl delete -n $(K8NS) -f ./deployment
@@ -97,6 +103,9 @@ delete-deployment:
 ###
 deploy-routing-config:
 	sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.config.yaml | kubectl apply -n $(K8NS) -f -
+
+deploy-guarded-routing-config:
+	sed -e 's|~APP_HOST|$(APP_HOST)|g;' config/routing.guard.config.yaml | kubectl apply -n $(K8NS) -f -
 
 deploy-orders-service-config:
 	sed -e 's|~DB_HOST|$(DB_HOST)|g;s|~DB_PORT|$(DB_PORT)|g;s|~DB_USER|$(DB_USER)|g;s|~DB_PASSWORD|$(DB_PASSWORD)|g;' config/orders-service.config.yaml | kubectl apply -n $(K8NS) -f -
@@ -110,7 +119,10 @@ deploy-db-config:
 deploy-app-general-config:
 	sed -e 's|~FRONTEND_URL|$(FRONTEND_URL)|g;' config/general-app.config.yaml | kubectl apply -n $(K8NS) -f -
 
-deploy-config:	deploy-db-config deploy-app-general-config deploy-routing-config deploy-orders-service-config deploy-customers-service-config
+deploy-api-gateway-config:
+	kubectl apply -n $(K8NS) -f  config/api-gateway-kong.config.yaml
+
+deploy-config:	deploy-api-gateway-config deploy-db-config deploy-app-general-config deploy-routing-config deploy-guarded-routing-config deploy-orders-service-config deploy-customers-service-config
 
 delete-config:
 	kubectl delete -n $(K8NS) -f ./config
@@ -118,7 +130,7 @@ delete-config:
 
 
 
-deploy-app: create-namespace deploy-kong-gateway deploy-config depoly-mysql-db deploy-deployment
+deploy-app: create-namespace deploy-config depoly-mysql-db deploy-kong-gateway deploy-deployment
 
 delete-app:
 	kubectl delete ns $(K8NS)
