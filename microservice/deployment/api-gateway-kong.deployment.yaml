@@ -1,14 +1,7 @@
-#apiVersion: configuration.konghq.com/v1
-#kind: KongPlugin
-#metadata:
-#  name: api-gateway
-#plugin: api-gateway
 apiVersion: configuration.konghq.com/v1
-kind: KongClusterPlugin
+kind: KongPlugin
 metadata:
   name: api-gateway
-  annotations:
-    kubernetes.io/ingress.class: "kong"
-  labels:
-      global: "false"
+config:
+  minute: "10"
 plugin: api-gateway

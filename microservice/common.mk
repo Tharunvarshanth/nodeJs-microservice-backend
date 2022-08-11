@@ -122,7 +122,7 @@ deploy-app-general-config:
 deploy-api-gateway-config:
 	kubectl apply -n $(K8NS) -f  config/api-gateway-kong.config.yaml
 
-deploy-config:	deploy-api-gateway-config deploy-db-config deploy-app-general-config deploy-routing-config deploy-guarded-routing-config deploy-orders-service-config deploy-customers-service-config
+deploy-config: deploy-db-config deploy-api-gateway-config deploy-app-general-config deploy-routing-config deploy-guarded-routing-config deploy-orders-service-config deploy-customers-service-config
 
 delete-config:
 	kubectl delete -n $(K8NS) -f ./config
