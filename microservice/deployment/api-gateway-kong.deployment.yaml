@@ -4,4 +4,9 @@ metadata:
   name: api-gateway
 config:
   minute: "10"
+  super_admin:
+    - "res:user":
+        - "scopes:view"
+    - "res:policy":
+         - "scopes:edit"
 plugin: api-gateway
